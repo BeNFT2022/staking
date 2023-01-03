@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 import {
     ConnectionProvider,
     WalletProvider
@@ -17,6 +19,8 @@ import Stake from "./Stake";
 
 require("./App.css");
 require("@solana/wallet-adapter-react-ui/styles.css");
+
+global.Buffer = Buffer;
 
 const endpoint = process.env.REACT_APP_RPC_URL!;
 

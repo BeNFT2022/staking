@@ -1,11 +1,14 @@
 import type { FC } from "react";
-import React, { useCallback, useState } from "react";
-import { Buffer } from "buffer";
-
-import { Transaction } from "@solana/web3.js";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+
+import {
+    BENFT_TOKEN_DECIMALS,
+    createStakeAuxAccountTransaction,
+    getStakesForAccount
+} from "./lib";
 
 export const Stake: FC = () => {
     let { connection } = useConnection();
@@ -13,49 +16,65 @@ export const Stake: FC = () => {
 
     let [amount, setAmount] = useState<string>("0");
 
-    let logs: string[] = [];
+    let [stakedAccounts, setStakedAccounts] = useState<any[]>([]);
+    useEffect(() => {
+        (async () => {
+            if (!publicKey) return;
+            let stakedAccounts = await getStakesForAccount(
+                connection,
+                publicKey
+            );
+            setStakedAccounts(stakedAccounts);
+
+            console.log(stakedAccounts);
+        })();
+    }, [connection, publicKey]);
+
+    let [logs, setLogs] = useState<string[]>([]);
+    const log = useCallback(
+        (message: string) => {
+            console.log(message);
+            setLogs(logs.concat(message));
+        },
+        [logs]
+    );
+
     const handleStake = useCallback(
         () =>
             (async () => {
                 if (!publicKey) return;
 
-                logs.push(`requesting stake for ${amount} tokens`);
-                let response = await fetch("/api/stake", {
-                    method: "POST",
-                    headers: {
-                        "content-type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        wallet: publicKey,
-                        amount: parseInt(amount)
-                    })
-                });
-                let json = await response.json();
+                log(`requesting stake for ${amount} tokens`);
 
-                if (!response.ok) {
-                    logs.push(`error: ${json.error}`);
+                let tx;
+                try {
+                    let tokenAmount =
+                        BigInt(amount) * 10n ** BENFT_TOKEN_DECIMALS;
+                    tx = await createStakeAuxAccountTransaction(
+                        connection,
+                        publicKey,
+                        tokenAmount
+                    );
+                } catch (e: any) {
+                    console.error(e);
+                    log(`error: ${e.message}`);
                     return;
                 }
-
-                let tx = Transaction.from(
-                    Buffer.from(json.transaction, "base64")
-                );
 
                 let signature;
                 try {
                     signature = await sendTransaction(tx, connection);
-                    console.log(signature);
-                    logs.push(
+                    log(
                         `stake for ${amount} tokens successful: transaction signature ${signature}`
                     );
                 } catch (e: any) {
                     console.error(e);
-                    logs.push(
+                    log(
                         `stake for ${amount} tokens unsuccessful: ${e.message}`
                     );
                 }
             })(),
-        [publicKey, connection, amount, sendTransaction]
+        [publicKey, connection, amount, sendTransaction, log]
     );
 
     return (
@@ -77,7 +96,7 @@ export const Stake: FC = () => {
 
             <section>
                 <div>Logs</div>
-                <div>{logs.join("\n")}</div>
+                <pre>{logs.join("\n")}</pre>
             </section>
         </>
     );
