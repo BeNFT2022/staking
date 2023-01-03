@@ -1,5 +1,5 @@
 {
-    "name": "BeNFT Token Staking",
+    "name": "benft-token-staking",
     "scripts": {
         "clean": "shx mkdir -p build lib && shx rm -rf build lib",
         "start": "react-app-rewired start",

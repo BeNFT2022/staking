@@ -26,9 +26,6 @@ const BENFT_TOKEN_DECIMALS = 9n;
 const DELEGATE_AUTHORITY_ADDRESS = new PublicKey(
     process.env.DELEGATE_AUTHORITY_ADDRESS!
 );
-const BENFT_FREEZE_AUTHORITY_KEYPAIR = Keypair.fromSecretKey(
-    Uint8Array.from(JSON.parse(process.env.BENFT_FREEZE_AUTHORITY_KEYPAIR!))
-);
 
 const connection = new Connection(process.env.REACT_APP_RPC_URL!);
 
@@ -73,7 +70,6 @@ export default async function swap(
         .getLatestBlockhash()
         .then(({ blockhash }) => blockhash);
 
-    tx.partialSign(BENFT_FREEZE_AUTHORITY_KEYPAIR);
     tx.partialSign(auxAccountKeypair);
 
     response.status(200).json({
@@ -111,14 +107,8 @@ function createAndFreezeStakeAuxAccount(
             auxAccount,
             DELEGATE_AUTHORITY_ADDRESS,
             wallet,
-            amount
+            0 // delegate is 0, used to keep track of who sent the tokens
         ),
-
-        createFreezeAccountInstruction(
-            auxAccount,
-            BENFT_TOKEN_ADDRESS,
-            BENFT_FREEZE_AUTHORITY_KEYPAIR.publicKey
-        )
     );
 }
 
