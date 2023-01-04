@@ -49,7 +49,7 @@ export const Stake: FC = () => {
                 let tx;
                 try {
                     let tokenAmount =
-                        BigInt(amount) * 10n ** BENFT_TOKEN_DECIMALS;
+                        BigInt(amount) * BigInt(10 ** BENFT_TOKEN_DECIMALS);
                     tx = await createStakeAuxAccountTransaction(
                         connection,
                         publicKey,

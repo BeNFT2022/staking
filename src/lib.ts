@@ -20,7 +20,7 @@ import {
 export const BENFT_TOKEN_ADDRESS = new PublicKey(
     "BeNFTTK1zwAnDHTPmzGEnvfZzdWEBKZ1wt4BKkmKtXTv"
 );
-export const BENFT_TOKEN_DECIMALS = 9n;
+export const BENFT_TOKEN_DECIMALS = 9;
 
 const TOKEN_ACCOUNT_MINIMUM_BALANCE = 2039280;
 
