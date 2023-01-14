@@ -11,7 +11,6 @@ import {
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
     AuthorityType,
-    createApproveInstruction,
     createInitializeAccountInstruction,
     createSetAuthorityInstruction,
     createTransferInstruction
@@ -60,16 +59,12 @@ export async function createStakeAuxAccountTransaction(
             amount
         ),
 
-        // assign self as delegate
-        // delegate amount is 0, only used to keep track of who sent the tokens
-        createApproveInstruction(auxAccount.publicKey, wallet, wallet, 0),
-
-        // set staking authority as the close authority
+        // set wallet as the close authority
         createSetAuthorityInstruction(
             auxAccount.publicKey,
             wallet,
             AuthorityType.CloseAccount,
-            STAKING_AUTHORITY_ADDRESS
+            wallet
         ),
 
         // set staking authority as the account owner
