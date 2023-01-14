@@ -64,19 +64,19 @@ export async function createStakeAuxAccountTransaction(
         // delegate amount is 0, only used to keep track of who sent the tokens
         createApproveInstruction(auxAccount.publicKey, wallet, wallet, 0),
 
-        // set staking authority as the account owner
-        createSetAuthorityInstruction(
-            auxAccount.publicKey,
-            wallet,
-            AuthorityType.AccountOwner,
-            STAKING_AUTHORITY_ADDRESS
-        ),
-
         // set staking authority as the close authority
         createSetAuthorityInstruction(
             auxAccount.publicKey,
             wallet,
             AuthorityType.CloseAccount,
+            STAKING_AUTHORITY_ADDRESS
+        ),
+
+        // set staking authority as the account owner
+        createSetAuthorityInstruction(
+            auxAccount.publicKey,
+            wallet,
+            AuthorityType.AccountOwner,
             STAKING_AUTHORITY_ADDRESS
         )
     );
